@@ -1,0 +1,7 @@
+# pack-refs with: peeled fully-peeled sorted 
+fabd855c66c1a64057590eb4c41c57c0b7720061 refs/remotes/origin/bugfix/pipeline-setup
+897b1091bb6aff625de91600a1212b6857ff6942 refs/remotes/origin/development
+3d2b0fcdf8dd1853d1cd8c0b80ec3ce6570b62d8 refs/remotes/origin/feature/bit-butcket-pipeline
+3d2b0fcdf8dd1853d1cd8c0b80ec3ce6570b62d8 refs/remotes/origin/hotfix/sms-issue
+c06ad4a7639cfe2e1ac3c0d8ac5bae9a38e11bbd refs/remotes/origin/master
+3d2b0fcdf8dd1853d1cd8c0b80ec3ce6570b62d8 refs/remotes/origin/release/deployment-course

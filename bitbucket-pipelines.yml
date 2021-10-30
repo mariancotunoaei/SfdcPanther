@@ -1,0 +1,228 @@
+
+image: atlassian/default-image:2
+
+
+pipelines:
+
+  pull-requests:
+  
+    development:
+      - step:
+          name: 'Run Step from PR'
+          script:
+            - echo 'I am from PR in Developmet branch'
+      - step:
+          name: 'Perform Validation due to PR'
+          script:
+            - echo 'I am from PR in Developmet branch'
+            
+    master:
+      - step:
+          name: 'Run Step from PR'
+          script:
+            - echo 'I am from PR in master branch'
+      - step:
+          name: 'Perform Validation due to PR'
+          script:
+            - echo 'I am from PR in master branch'
+            
+  branches:
+    development:
+      - step:
+          name: 'Deploy to test environment Message'
+          script:
+          - echo Deploying to test environment
+      - step:
+          name: 'Deploy to test environment'
+          deployment: test
+          # run the pipeline if changes were made to any of the actual metadata
+          condition:
+              changesets:
+                  includePaths:
+                    - "force-app/main/default/**"
+                    - "src/**"
+          script:
+          - export CLIURL=https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz
+          - export SFDX_AUTOUPDATE_DISABLE=true
+          - export SFDX_USE_GENERIC_UNIX_KEYCHAIN=true
+          - export SFDX_DOMAIN_RETRY=300
+          - export SFDX_DISABLE_APP_HUB=true
+          - export SFDX_LOG_LEVEL=DEBUG
+          - export DEPLOYDIR=src
+          - export TESTLEVEL=RunLocalTests
+          #Create sfdx directory
+          - mkdir ~/sfdx
+          #Install Salesforce CLI
+          - wget -qO- ${DX_CLI_URL_CUSTOM-$CLIURL} | tar xJ -C ~/sfdx --strip-components 1
+          - export PATH=~/sfdx/bin:$PATH
+          - sfdx --version
+          - sfdx plugins --core
+          - sfdx update
+          - echo $SFDC_HOST_LOGIN
+          - echo $SFDC_USERNAME
+          - echo $CONNECTED_APP_CONSUMER_KEY
+          - sfdx auth:jwt:grant --clientid $CONNECTED_APP_CONSUMER_KEY --jwtkeyfile JWT/server.key --username $SFDC_USERNAME -d --instanceurl $SFDC_HOST_LOGIN --setalias 'sandbox-dev'
+          - sfdx force:source:deploy --sourcepath 'force-app/main/default' --testlevel 'NoTestRun' --targetusername 'sandbox-dev'
+    
+    hotfix/*:
+      - step:
+          name: 'Deploy to Hotgix Environment environment Message'
+          script:
+          - echo 'Deploy to Hotgix Environment environment'
+      - step:
+          name: 'Deploy to Hotgix Environment environment'
+          script:
+          - export CLIURL=https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz
+          - export SFDX_AUTOUPDATE_DISABLE=false
+          - export SFDX_USE_GENERIC_UNIX_KEYCHAIN=true
+          - export SFDX_DOMAIN_RETRY=300
+          - export SFDX_DISABLE_APP_HUB=true
+          - export SFDX_LOG_LEVEL=DEBUG
+          - export DEPLOYDIR=src
+          - export TESTLEVEL=RunLocalTests
+          #Create sfdx directory
+          - mkdir ~/sfdx
+          #Install Salesforce CLI
+          - wget -qO- ${DX_CLI_URL_CUSTOM-$CLIURL} | tar xJ -C ~/sfdx --strip-components 1
+          - export PATH=~/sfdx/bin:$PATH
+          - sfdx --version
+          - sfdx plugins --core
+          - sfdx update
+          - echo SFDC_HOST_LOGIN
+          - echo SFDC_USERNAME
+          - echo CONNECTED_APP_CONSUMER_KEY
+          - sfdx auth:jwt:grant --clientid $CONNECTED_APP_CONSUMER_KEY --jwtkeyfile JWT/server.key --username $SFDC_USERNAME -d --instanceurl $SFDC_HOST_LOGIN --setalias 'sandbox-dev'
+          - sfdx force:source:deploy --sourcepath 'force-app/main/default' --testlevel 'NoTestRun' --targetusername 'sandbox-dev'
+          
+    bugfix/*:
+
+      - step:
+          script:
+          - export CLIURL=https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz
+          - export SFDX_AUTOUPDATE_DISABLE=false
+          - export SFDX_USE_GENERIC_UNIX_KEYCHAIN=true
+          - export SFDX_DOMAIN_RETRY=300
+          - export SFDX_DISABLE_APP_HUB=true
+          - export SFDX_LOG_LEVEL=DEBUG
+          - export DEPLOYDIR=src
+          - export TESTLEVEL=RunLocalTests
+          #Create sfdx directory
+          - mkdir ~/sfdx
+          #Install Salesforce CLI
+          - wget -qO- ${DX_CLI_URL_CUSTOM-$CLIURL} | tar xJ -C ~/sfdx --strip-components 1
+          - export PATH=~/sfdx/bin:$PATH
+          - sfdx --version
+          - sfdx plugins --core
+          - sfdx update
+          - echo SFDC_HOST_LOGIN
+          - echo SFDC_USERNAME
+          - echo CONNECTED_APP_CONSUMER_KEY
+          - sfdx auth:jwt:grant --clientid $CONNECTED_APP_CONSUMER_KEY --jwtkeyfile JWT/server.key --username $SFDC_USERNAME -d --instanceurl $SFDC_HOST_LOGIN --setalias 'sandbox-dev'
+          - sfdx force:source:deploy --sourcepath 'force-app/main/default' --testlevel 'NoTestRun' --targetusername 'sandbox-dev'
+    
+    release/*:
+      - step:
+          script:
+          - export CLIURL=https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz
+          - export SFDX_AUTOUPDATE_DISABLE=false
+          - export SFDX_USE_GENERIC_UNIX_KEYCHAIN=true
+          - export SFDX_DOMAIN_RETRY=300
+          - export SFDX_DISABLE_APP_HUB=true
+          - export SFDX_LOG_LEVEL=DEBUG
+          - export DEPLOYDIR=src
+          - export TESTLEVEL=RunLocalTests
+          #Create sfdx directory
+          - mkdir ~/sfdx
+          #Install Salesforce CLI
+          - wget -qO- ${DX_CLI_URL_CUSTOM-$CLIURL} | tar xJ -C ~/sfdx --strip-components 1
+          - export PATH=~/sfdx/bin:$PATH
+          - sfdx --version
+          - sfdx plugins --core
+          - sfdx update
+          - echo SFDC_HOST_LOGIN
+          - echo SFDC_USERNAME
+          - echo CONNECTED_APP_CONSUMER_KEY
+          - sfdx auth:jwt:grant --clientid $CONNECTED_APP_CONSUMER_KEY --jwtkeyfile JWT/server.key --username $SFDC_USERNAME -d --instanceurl $SFDC_HOST_LOGIN --setalias 'sandbox-dev'
+          - sfdx force:source:deploy --sourcepath 'force-app/main/default' --testlevel 'NoTestRun' --targetusername 'sandbox-dev'
+    
+    feature/*:
+      - step:
+          script:
+          - export CLIURL=https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz
+          - export SFDX_AUTOUPDATE_DISABLE=false
+          - export SFDX_USE_GENERIC_UNIX_KEYCHAIN=true
+          - export SFDX_DOMAIN_RETRY=300
+          - export SFDX_DISABLE_APP_HUB=true
+          - export SFDX_LOG_LEVEL=DEBUG
+          - export DEPLOYDIR=src
+          - export TESTLEVEL=RunLocalTests
+          #Create sfdx directory
+          - mkdir ~/sfdx
+          #Install Salesforce CLI
+          - wget -qO- ${DX_CLI_URL_CUSTOM-$CLIURL} | tar xJ -C ~/sfdx --strip-components 1
+          - export PATH=~/sfdx/bin:$PATH
+          - sfdx --version
+          - sfdx plugins --core
+          - sfdx update
+          - echo SFDC_HOST_LOGIN
+          - echo SFDC_USERNAME
+          - echo CONNECTED_APP_CONSUMER_KEY
+          - sfdx auth:jwt:grant --clientid $CONNECTED_APP_CONSUMER_KEY --jwtkeyfile JWT/server.key --username $SFDC_USERNAME -d --instanceurl $SFDC_HOST_LOGIN --setalias 'sandbox-dev'
+          - sfdx force:source:deploy --sourcepath 'force-app/main/default' --testlevel 'NoTestRun' --targetusername 'sandbox-dev'
+    
+    master:
+      - step:
+          # run the pipeline if changes were made to any of the actual metadata
+          condition:
+              changesets:
+                  includePaths:
+                    - "force-app/main/default/**"
+                    - "src/**"
+          script:
+          - echo 'Deploying to production'
+      - step:
+          deployment: production
+          trigger: manual
+          # run the pipeline if changes were made to any of the actual metadata
+          condition:
+              changesets:
+                  includePaths:
+                    - "force-app/main/default/**"
+                    - "src/**"
+          script:
+          - export CLIURL=https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz
+          - export SFDX_AUTOUPDATE_DISABLE=false
+          - export SFDX_USE_GENERIC_UNIX_KEYCHAIN=true
+          - export SFDX_DOMAIN_RETRY=300
+          - export SFDX_DISABLE_APP_HUB=true
+          - export SFDX_LOG_LEVEL=DEBUG
+          - export DEPLOYDIR=src
+          - export TESTLEVEL=RunLocalTests
+          #Create sfdx directory
+          - mkdir ~/sfdx
+          #Install Salesforce CLI
+          - wget -qO- ${DX_CLI_URL_CUSTOM-$CLIURL} | tar xJ -C ~/sfdx --strip-components 1
+          - export PATH=~/sfdx/bin:$PATH
+          - sfdx --version
+          - sfdx plugins --core
+          - sfdx update
+          - echo SFDC_HOST_LOGIN
+          - echo SFDC_USERNAME
+          - echo CONNECTED_APP_CONSUMER_KEY
+          - sfdx auth:jwt:grant --clientid $CONNECTED_APP_CONSUMER_KEY --jwtkeyfile JWT/server.key --username $SFDC_USERNAME -d --instanceurl $SFDC_HOST_LOGIN --setalias 'sandbox-dev'
+          - sfdx force:source:deploy --sourcepath 'force-app/main/default' --testlevel 'NoTestRun' --targetusername 'sandbox-dev'
+    
+  default:
+    - parallel:
+      - step:
+          name: 'Build and Test'
+          script:
+            - echo "Your build and test goes here..."
+      - step:
+          name: 'Lint'
+          script:
+            - echo "Your linting goes here..."
+      - step:
+          name: 'Security scan'
+          script:
+            - echo "Your security scan goes here..."
